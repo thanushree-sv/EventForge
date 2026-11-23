@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EventForge - Smart Event Planning</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128197;</text></svg>">
+<style>
+  body { font-family: system-ui, Arial, sans-serif; background: #f4f6fb; margin: 0; color: #1f2937; }
+  header { background: linear-gradient(135deg, #312e81, #4338ca 55%, #7c3aed); color: #fff; padding: 30px 20px 64px; }
+  .hero { max-width: 1000px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .logo { width: 64px; height: 64px; flex: none; border-radius: 16px; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+  header h1 { margin: 0; font-size: 34px; letter-spacing: .5px; }
+  header h1 span { color: #fbbf24; }
+  header p { margin: 2px 0 0; opacity: .9; font-size: 15px; }
+  header p.tagline { margin-top: 20px; font-size: 17px; }
+  button:hover { filter: brightness(1.12); }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tab { background: #fff; color: #4338ca; border: 2px solid #c7d2fe; font-weight: 600; }
+  .tab.on { background: #4338ca; color: #fff; border-color: #4338ca; }
+  footer { text-align: center; color: #6b7280; font-size: 13px; padding: 10px 0 30px; }
+  @media (max-width: 600px) { header h1 { font-size: 27px; } .logo { width: 52px; height: 52px; } }
+  main { max-width: 1000px; margin: -38px auto 20px; padding: 0 16px; position: relative; }
+  .card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card h3 { margin: 0 0 10px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input, select, button { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+  button { background: #4338ca; color: #fff; border: none; cursor: pointer; }
+  button.alt { background: #e5e7eb; color: #111; }
+  button.danger { background: #dc2626; }
+  button.ok { background: #16a34a; }
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 140px; background: #eef2ff; padding: 10px; border-radius: 8px; font-size: 13px; }
+  .stat b { display: block; font-size: 18px; margin-top: 2px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; color: #fff; font-size: 13px; }
+  .FULLY_PROTECTED { background: #16a34a; }
+  .INCOMPLETE_BACKUPS { background: #d97706; }
+  .RUNNING_ON_BACKUP { background: #2563eb; }
+  .ACTION_REQUIRED { background: #dc2626; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .res { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; font-size: 14px; }
+  .res.active { border-color: #4338ca; background: #eef2ff; }
+  .res.bad { border-color: #dc2626; background: #fef2f2; }
+  .tag { font-size: 11px; text-transform: uppercase; color: #6b7280; }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 18px;
+           border-radius: 8px; color: #fff; display: none; max-width: 90%; }
+  @media (max-width: 600px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="EventForge logo">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fbbf24"/>
+            <stop offset="1" stop-color="#f97316"/>
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="16" fill="#ffffff"/>
+        <rect x="12" y="16" width="40" height="36" rx="6" fill="none" stroke="#4338ca" stroke-width="4"/>
+        <line x1="12" y1="27" x2="52" y2="27" stroke="#4338ca" stroke-width="4"/>
+        <line x1="22" y1="9" x2="22" y2="20" stroke="#4338ca" stroke-width="4" stroke-linecap="round"/>
+        <line x1="42" y1="9" x2="42" y2="20" stroke="#4338ca" stroke-width="4" stroke-linecap="round"/>
+        <path d="M24 40 l6 6 l11 -12" fill="none" stroke="url(#lg)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Event<span>Forge</span></h1>
+        <p>Smart Event Planning &amp; Backup Management</p>
+      </div>
+    </div>
+    <p class="tagline">Plan the event. Plan the backup. Stay calm when things change.</p>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <h3>Add a new event</h3>
+    <div class="row">
+      <input id="evName" placeholder="Event name">
+      <input id="evDate" placeholder="Date (e.g. 15-Dec-2026)">
+      <input id="evBudget" type="number" min="1" placeholder="Budget (Rs.)">
+      <button onclick="addNewEvent()">Add event</button>
+      <button class="alt" onclick="cancelBackup(); api('/api/demo')">Load demo event</button>
+    </div>
+  </div>
+
+  <div id="dashboard"></div>
+
+  <div class="card" id="formCard" style="display:none">
+    <h3 id="formTitle">Add a resource</h3>
+    <div class="row">
+      <input id="role" placeholder="What is it for? (e.g. Catering)">
+      <select id="type" onchange="typeChanged()">
+        <option value="venue">Venue</option>
+        <option value="vendor">Vendor</option>
+        <option value="volunteer">Volunteer</option>
+        <option value="equipment">Equipment (tech)</option>
+        <option value="decoration">Decoration</option>
+      </select>
+      <input id="name" placeholder="Name">
+      <input id="cost" type="number" min="0" placeholder="Cost (Rs.)">
+      <input id="extra" placeholder="Capacity">
+      <input id="qty" type="number" min="1" placeholder="Quantity" style="display:none">
+      <button id="submitBtn" onclick="submitForm()">Add</button>
+      <button class="alt" id="cancelBtn" onclick="cancelBackup()" style="display:none">Cancel</button>
+    </div>
+  </div>
+</main>
+
+<footer>EventForge &middot; Java OOP Lab Project</footer>
+
+<div id="toast"></div>
+
+<script>
+var state = null;
+var backupIndex = -1;   // -1 means "adding a primary resource"
+
+function $(id) { return document.getElementById(id); }
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+
+function money(n) {
+  return "Rs." + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function notify(msg, isError) {
+  var t = $("toast");
+  t.textContent = msg;
+  t.style.background = isError ? "#dc2626" : "#16a34a";
+  t.style.display = "block";
+  setTimeout(function () { t.style.display = "none"; }, 3500);
+}
+
+// Talks to the Java server. Returns true if it worked.
+async function api(path, params) {
+  try {
+    var url = path + "?" + new URLSearchParams(params || {});
+    var res = await fetch(url, { method: "POST" });
+    var data = await res.json();
+    if (data.error) {
+      notify(data.error, true);
+      return false;
+    }
+    state = data;
+    render();
+    if (data.message) {
+      notify(data.message, false);
+    }
+    return true;
+  } catch (err) {
+    notify("Cannot reach the server. Is 'java WebServer' still running? (" + err.message + ")", true);
+    return false;
+  }
+}
+
+function addNewEvent() {
+  cancelBackup();
+  api("/api/create", { name: $("evName").value, date: $("evDate").value, budget: $("evBudget").value });
+}
+
+function resBox(tag, r, isActive) {
+  var cls = "res";
+  if (!r.available) { cls = "res bad"; }
+  else if (isActive) { cls = "res active"; }
+  var status = r.available ? "Available" : "UNAVAILABLE";
+  if (isActive && r.available) { status = "In use"; }
+  return '<div class="' + cls + '"><div class="tag">' + tag + ' &middot; ' + esc(r.type) + '</div>'
+       + '<b>' + esc(r.name) + '</b><br>' + money(r.cost) + '<br>' + status + '</div>';
+}
+
+function tabsHtml() {
+  if (!state || !state.eventNames || state.eventNames.length === 0) { return ""; }
+  var h = '<div class="tabs">';
+  for (var t = 0; t < state.eventNames.length; t++) {
+    var cls = (t === state.current) ? "tab on" : "tab";
+    h += '<button class="' + cls + '" onclick="selectEvent(' + t + ')">' + esc(state.eventNames[t]) + '</button>';
+  }
+  return h + '</div>';
+}
+
+function selectEvent(i) {
+  cancelBackup();
+  api("/api/select", { index: i });
+}
+
+function render() {
+  var d = $("dashboard");
+  if (!state || !state.exists) {
+    d.innerHTML = "";
+    $("formCard").style.display = "none";
+    return;
+  }
+  $("formCard").style.display = "block";
+
+  var html = tabsHtml() + '<div class="card"><h3>' + esc(state.name) + ' <small style="font-weight:normal">(' + esc(state.date) + ')</small></h3>'
+    + '<div class="stats">'
+    + '<div class="stat">Budget<b>' + money(state.budget) + '</b></div>'
+    + '<div class="stat">Spent<b>' + money(state.spent) + '</b></div>'
+    + '<div class="stat">Left<b>' + money(state.left) + '</b></div>'
+    + '<div class="stat">Status<b><span class="badge ' + state.status + '">' + state.status.replace(/_/g, " ") + '</span></b></div>'
+    + '</div><p style="margin:10px 0 0;font-size:14px">' + esc(state.statusMessage) + '</p></div>';
+
+  if (state.items.length === 0) {
+    html += '<div class="card">No resources yet. Add one below.</div>';
+  }
+
+  for (var i = 0; i < state.items.length; i++) {
+    var it = state.items[i];
+    var backupBox = it.backup ? resBox("Backup", it.backup, it.backupActive)
+                              : '<div class="res bad">No backup planned!</div>';
+    html += '<div class="card"><div class="row" style="justify-content:space-between">'
+      + '<h3 style="margin:0">' + (i + 1) + '. ' + esc(it.role) + '</h3><b>' + money(it.cost) + '</b></div>'
+      + '<div class="pair">' + resBox("Primary", it.primary, !it.backupActive) + backupBox + '</div>'
+      + '<div class="row">'
+      + '<button class="danger" onclick="fail(' + i + ')">Mark in-use resource as failed</button>'
+      + '<button class="ok" onclick="activate(' + i + ')">Activate backup</button>'
+      + '<button class="alt" onclick="setBackup(' + i + ')">' + (it.backup ? "Change" : "Add") + ' backup</button>'
+      + '</div></div>';
+  }
+  d.innerHTML = html;
+}
+
+function fail(i) { api("/api/fail", { index: i }); }
+function activate(i) { api("/api/activate", { index: i }); }
+
+function setBackup(i) {
+  backupIndex = i;
+  $("formTitle").textContent = "Assign backup for item " + (i + 1) + " (must be the same type as the primary)";
+  $("role").style.display = "none";
+  $("submitBtn").textContent = "Save backup";
+  $("cancelBtn").style.display = "inline-block";
+  $("formCard").scrollIntoView({ behavior: "smooth" });
+}
+
+function cancelBackup() {
+  backupIndex = -1;
+  $("formTitle").textContent = "Add a resource";
+  $("role").style.display = "inline-block";
+  $("submitBtn").textContent = "Add";
+  $("cancelBtn").style.display = "none";
+}
+
+function typeChanged() {
+  var t = $("type").value;
+  var labels = { venue: "Capacity", vendor: "Service (Catering/Decor...)", volunteer: "Role", decoration: "Theme (Floral/Balloon...)" };
+  $("extra").style.display = (t === "equipment") ? "none" : "inline-block";
+  $("qty").style.display = (t === "equipment") ? "inline-block" : "none";
+  $("extra").placeholder = labels[t] || "";
+  $("cost").placeholder = (t === "equipment") ? "Cost per item (Rs.)" : "Cost (Rs.)";
+}
+
+async function submitForm() {
+  var params = { type: $("type").value, name: $("name").value, cost: $("cost").value,
+                 extra: $("extra").value, qty: $("qty").value };
+  var ok;
+  if (backupIndex < 0) {
+    params.role = $("role").value;
+    ok = await api("/api/add", params);
+  } else {
+    params.index = backupIndex;
+    ok = await api("/api/backup", params);
+    if (ok) { cancelBackup(); }
+  }
+  if (ok) {
+    $("name").value = ""; $("cost").value = ""; $("extra").value = ""; $("qty").value = ""; $("role").value = "";
+  }
+}
+
+typeChanged();
+api("/api/event");
+</script>
+</body>
+</html>

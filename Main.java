@@ -144,11 +144,17 @@ public class Main {
 
     // Polymorphism: returns a Resource variable, but the real object
     // is a Venue, Vendor, Volunteer or Equipment
-    static Resource readResource(String label) {
-        System.out.println(label + " type: 1.Venue 2.Vendor 3.Volunteer 4.Equipment");
+        static Resource readResource(String label) {
+        System.out.println(label + " type: 1.Venue 2.Vendor 3.Volunteer 4.Equipment(tech) 5.Decoration");
         int type = readInt("Type: ");
         String name = readLine("Name: ");
-        double cost = readDouble("Cost (Rs.) [unit cost for equipment]: ");
+
+        double cost;
+        if (type == 4) {
+            cost = readDouble("Cost per item (Rs.): ");
+        } else {
+            cost = readDouble("Cost (Rs.): ");
+        }
 
         if (type == 1) {
             int capacity = readInt("Capacity: ");
@@ -162,11 +168,13 @@ public class Main {
         } else if (type == 4) {
             int qty = readInt("Quantity: ");
             return new Equipment(name, cost, qty);
+        } else if (type == 5) {
+            String theme = readLine("Theme (Floral/Balloon/Lighting/...): ");
+            return new Decoration(name, cost, theme);
         } else {
             throw new IllegalArgumentException("Unknown resource type");
         }
     }
-
     static void loadDemo() {
         try {
             Event e = new Event("Tech Fest 2026", "15-Dec-2026", 200000);
@@ -177,6 +185,8 @@ public class Main {
             e.addAllocation("Registration Desk", new Volunteer("Anita", 500, "Registration"));
             e.assignBackup(2, new Volunteer("Ravi", 500, "Registration"));
             e.addAllocation("Projectors", new Equipment("HD Projector", 2000, 4));
+            e.addAllocation("Stage Decor", new Decoration("Floral Stage Setup", 15000, "Floral"));
+            e.assignBackup(4, new Decoration("Balloon Arch Setup", 12000, "Balloon"));
             e.assignBackup(3, new Equipment("Spare Projector", 2000, 2));
             events.add(e);
             System.out.println("Demo event loaded: " + e.getName());

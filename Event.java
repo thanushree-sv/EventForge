@@ -19,6 +19,7 @@ public class Event implements Reportable {
     }
 
     public String getName() { return name; }
+    public String getDate() { return date; }
     public double getBudget() { return budget; }
     public ArrayList<Allocation> getAllocations() { return allocations; }
 
@@ -44,8 +45,8 @@ public class Event implements Reportable {
     public void addAllocation(String role, Resource primary) throws BudgetExceededException {
         Allocation a = new Allocation(role, primary);
         if (getTotalCost() + a.getCommittedCost() > budget) {
-            throw new BudgetExceededException("Not enough budget! Need Rs."
-                    + a.getCommittedCost() + " but only Rs." + getRemainingBudget() + " left");
+            throw new BudgetExceededException("Not enough budget! Need "
+                    + Resource.money(a.getCommittedCost()) + " but only " + Resource.money(getRemainingBudget()) + " left");
         }
         allocations.add(a);
     }
@@ -55,8 +56,8 @@ public class Event implements Reportable {
         Allocation a = getAllocation(index);
         double extraFee = backup.getCost() * Allocation.RESERVE_RATE - a.getBackupFee();
         if (getTotalCost() + extraFee > budget) {
-            throw new BudgetExceededException("Backup standby fee Rs." + extraFee
-                    + " is more than remaining budget Rs." + getRemainingBudget());
+            throw new BudgetExceededException("Backup standby fee " + Resource.money(extraFee)
+                    + " is more than remaining budget " + Resource.money(getRemainingBudget()));
         }
         a.setBackup(backup);
     }
@@ -133,10 +134,10 @@ public class Event implements Reportable {
 
         text = text + "--------------- COST BREAKDOWN ---------------\n";
         for (String type : costByType.keySet()) {
-            text = text + " " + type + ": Rs." + costByType.get(type) + "\n";
+            text = text + " " + type + ": " + Resource.money(costByType.get(type)) + "\n";
         }
-        text = text + " Budget: Rs." + budget + " | Spent: Rs." + getTotalCost()
-                + " | Left: Rs." + getRemainingBudget() + "\n";
+        text = text + " Budget: " + Resource.money(budget) + " | Spent: " + Resource.money(getTotalCost())
+                + " | Left: " + Resource.money(getRemainingBudget()) + "\n";
         text = text + " STATUS : " + getStatus() + " - " + getStatus().getMessage() + "\n";
         return text;
     }
